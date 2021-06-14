@@ -1,0 +1,21 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: go-test
+  annotations:
+    tekton.dev/tags: go-run-test
+spec:
+  resources:
+    inputs:
+      - name: source-repo
+        type: git
+  steps:
+    - name: go-run-test
+      image: golang:1.15-alpine
+      workingDir: /workspace/source-repo
+      env:
+      - name: CGO_ENABLED
+        value: "0"
+      command: ["go"]
+      args: ["test"]

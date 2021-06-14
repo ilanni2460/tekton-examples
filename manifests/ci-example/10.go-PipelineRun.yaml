@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: run-pipeline-go
+spec:
+  serviceAccountName: pipeline-sa
+  pipelineRef:
+    name: go-pipeline
+  resources:
+    - name: source-repo
+      resourceRef:
+        name: github-tekton-examples
+    - name: builtImage
+      resourceRef:
+        name: docker-registry-tekton-examples

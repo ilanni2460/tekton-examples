@@ -1,0 +1,23 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: image-tag
+  annotations:
+    tekton.dev/tags: git-commit-head
+spec:
+  resources:
+    inputs:
+      - name: source-repo
+        type: git
+  results:
+    - name: git-commit-head
+      description: The precise commit SHA that was fetched by this Task
+  steps:
+    - name: git-commit-head
+      image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.24.3
+      script: |
+        #!/usr/bin/env sh
+        cd /workspace/source-repo/
+        RESULT_SHA="$(git rev-parse --short HEAD | tr -d '\n')"
+        echo -n "$RESULT_SHA" > $(results.git-commit-head.path)

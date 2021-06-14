@@ -1,0 +1,11 @@
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: docker-registry-tekton-examples
+  namespace: default
+spec:
+  type: image
+  params:
+    - name: url
+      value: docker.io/prodan/tekton-examples

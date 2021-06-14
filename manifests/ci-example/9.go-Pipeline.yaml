@@ -1,0 +1,44 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: go-pipeline
+spec:
+  resources:
+    - name: source-repo
+      type: git
+    - name: builtImage
+      type: image
+  tasks:
+    # 运行应用测试
+    - name: go-test
+      taskRef:
+        name: go-test
+      resources:
+        inputs:
+          - name: source-repo      # Task 输入名称
+            resource: source-repo  # Pipeline 资源名称
+    - name: image-tag
+      taskRef:
+        name: image-tag
+      resources:
+        inputs:
+          - name: source-repo      # Task 输入名称
+            resource: source-repo  # Pipeline 资源名称
+      runAfter:
+        - go-test                  # go-test 任务执行之后
+    - name: build-and-push
+      params:
+        - name: imageTag
+          value: $(tasks.image-tag.results.git-commit-head) # 注入参数
+      taskRef:
+        name: build-and-push
+      resources:
+        inputs:
+          - name: source-repo      # Task 输入名称
+            resource: source-repo  # Pipeline 资源名称
+        outputs:
+          - name: builtImage
+            resource: builtImage
+      runAfter:
+        - image-tag                # image-tag 任务执行之后
